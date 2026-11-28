@@ -49,7 +49,8 @@ const subtitleLocales = {
 	Chinese: 'zh-Hans',
 	TraditionalChinese: 'zh-Hant',
 	Japanese: 'ja',
-	Korean: 'ko'
+	Korean: 'ko',
+	Thai: 'th'
 };
 let isVoicelinePlaying = false;
 
@@ -86,7 +87,8 @@ const AUDIO_DETAIL = [
                 "헤헤, 예쁘죠? 콜록콜록.",
                 "폴리비닐 아세탈으로 보존된 눈꽃입니다.",
                 "시간이 지날수록, 혹은 따뜻한 곳에 있더라도 녹지 않습니다."
-            ]
+            ],
+            Thai: ["แหะ ๆ สวยใช่ไหมคะ? แค่ก ๆ","นี่คือผลึกหิมะที่เก็บรักษาไว้ด้วยพอลิไวนิลอะซีทัลค่ะ","ต่อให้เวลาผ่านไป หรือเอาไปไว้ในที่อุ่น ๆ ก็ไม่ละลายค่ะ"]
         }
     },
     {
@@ -115,7 +117,8 @@ const AUDIO_DETAIL = [
                 "제가 가장 크고 아름다운 걸 찾고 싶었어요. 그리고 제가 생각하기 전에 이렇게 늦었습니다.",
                 "그래서 나는 그것을 영원히 빛나는 눈꽃 결정으로 바꾸어 놓았다.",
                 "이걸 볼 때마다 날 떠올릴 거야?"
-            ]
+            ],
+            Thai: ["ไหน ๆ ก็ลองหาอันที่ใหญ่และสวยที่สุดดูแล้ว... รู้ตัวอีกทีก็ดึกป่านนี้ซะแล้วค่ะ","ฟืด ๆ... ไหน ๆ ก็ทำแล้ว เลยลองทำเป็นผลึกหิมะที่ส่องแสงได้ตลอดไปค่ะ","เป็นยังไงคะ? ทุกครั้งที่เห็นสิ่งนี้ คุณครูจะนึกถึงฉันไหมคะ?"]
         }
     },
     {
@@ -144,7 +147,8 @@ const AUDIO_DETAIL = [
                 "젠장, 너무 좋아서 반가워",
                 "놀랍지 않나요? 이 모든 것은 화학입니다.",
                 "심지어 너와 나, 선생님도 화학을 통해 설명할 수 있습니다."
-            ]
+            ],
+            Thai: ["ฮึฮึ! เย้! ดีใจจังที่คุณครูชอบค่ะ","น่าทึ่งใช่ไหมคะ...? ทั้งนี่และนั่น ทั้งหมดก็คือเคมีเลยค่ะ","แม้แต่คุณครูกับฉัน... ก็อธิบายได้ด้วยเคมีเหมือนกันค่ะ"]
         }
     },
     {
@@ -173,7 +177,8 @@ const AUDIO_DETAIL = [
                 "우리가 보는 것, 우리가 정보를 처리하는 방식은 모두 전기 신호입니다. 그럼에도 불구하고, 그들은 서로 반응합니다.",
                 "비록 이 모든 것이 전기적 신호일 뿐이지만 결국에는 '감각'이라는 이름을 붙였습니다.",
                 "아니, 내가 싫어하는건 아니지..."
-            ]
+            ],
+            Thai: ["ทั้งสิ่งที่มองเห็นและการประมวลผลข้อมูล ล้วนเป็นแค่สัญญาณไฟฟ้า แต่กลับเกิดปฏิกิริยาต่อกันได้","ทั้งที่ทั้งหมดเป็นแค่สัญญาณไฟฟ้าแท้ ๆ แต่เราก็ตั้งชื่อให้มันว่า ‘ความรู้สึก’ ไปซะแล้วค่ะ","เปล่านะคะ ฉันไม่ได้ไม่ชอบเรื่องนั้นหรอก..."]
         }
     },
     {
@@ -202,7 +207,8 @@ const AUDIO_DETAIL = [
                 "그냥 생각했어요. 이런 반응이 일어나면, 우리도 같은 느낌을 받으면 좋겠어요.",
                 "농담이야! *침침침* 어쩌면 감기가 내 머리에 닿을 수도 있어!",
                 "아하!"
-            ]
+            ],
+            Thai: ["ฉันแค่คิดว่า ถ้าจะเกิดปฏิกิริยาแบบนี้ขึ้น ก็อยากให้เรารู้สึกเหมือนกันค่ะ","ล้อเล่นน่า! แค่ก ๆ! สงสัยจะเป็นหวัดจนเพี้ยนไปแล้วมั้งคะ!","อาฮะฮะ...! ฮะฮะ..."]
         }
     }
 ];
@@ -349,7 +355,7 @@ function playVoiceline() {
 			track.play().catch(finish);
 
 			if (dialogBox) {
-				textbox.textContent = dialog[window.selectedLanguage][index];
+				textbox.textContent = getSubtitleText(dialog, window.selectedLanguage, index);
 				textbox.style.opacity = 1;
 			}
 		},
@@ -525,6 +531,16 @@ function setMouse(event) {
 	return { x: ax - canvas.width * positionX, y: ay - canvas.height * positionY };
 }
 
+function getSubtitleText(dialog, language, index) {
+	let text = dialog?.[language]?.[index];
+	if (text == null && language === 'Thai') {
+		language = 'English';
+		text = dialog?.[language]?.[index];
+	}
+	textbox.lang = subtitleLocales[language];
+	return text ?? "";
+}
+
 function updateSubtitleLanguage() {
 	let language = subtitleLanguagePreference;
 	if (language === 'auto') {
@@ -538,6 +554,8 @@ function updateSubtitleLanguage() {
 			language = 'Japanese';
 		} else if (primary === 'ko' || primary === 'korean' || primary === 'koreana') {
 			language = 'Korean';
+		} else if (primary === 'th' || primary === 'thai') {
+			language = 'Thai';
 		} else {
 			language = 'English';
 		}
@@ -547,7 +565,7 @@ function updateSubtitleLanguage() {
 	window.selectedLanguage = language;
 	textbox.lang = subtitleLocales[language];
 	const clip = currentTracks.at(-1);
-	if (dialogBox && clip) textbox.textContent = clip.dialog[language][clip.index];
+	if (dialogBox && clip) textbox.textContent = getSubtitleText(clip.dialog, language, clip.index);
 }
 
 function init() {
